@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+source ~/.config/fzf/theme.sh
+
+# --print-query: line 1 = typed query, line 2 = key pressed, line 3 = selection.
+# ctrl-n always creates a dir from the query; enter creates one only if nothing matched.
+out=$(
+    {
+      find ~/.config -maxdepth 1 -type d
+      find ~/code -mindepth 2 -maxdepth 2 -type d -not -path '*/node_modules/*'
+    } | fzf --print-query --expect=ctrl-n \
+            --header 'enter: open · ctrl-n: create dir from query (group/name or just name)'
+)
+# 130 = esc / ctrl-c: never create anything on abort
+[[ $? -eq 130 ]] && exit 0
+
+query=$(sed -n 1p <<<"$out")
+key=$(sed -n 2p <<<"$out")
+selected=$(sed -n 3p <<<"$out")
+
+if [[ $key == ctrl-n || ( -z $selected && -n $query ) ]]; then
+  [[ -z $query ]] && exit 0
+  case $query in
+    /*)  selected=$query ;;
+    ~*)  selected="${query/#\~/$HOME}" ;;
+    */*) selected="$HOME/code/$query" ;;
+    *)
+      # Bare name: pick which group under ~/code it goes into
+      parent=$(find ~/code -mindepth 1 -maxdepth 1 -type d | fzf --header "create '$query' in:")
+      [[ -z $parent ]] && exit 0
+      selected="$parent/$query"
+      ;;
+  esac
+  mkdir -p "$selected" || exit 1
+fi
+
+[[ -z $selected ]] && exit 0
+
+project_name=$(basename "$selected")
+
+# Get all existing kitty app_ids
+all_app_ids=$(kitten @ ls | jq -r '.[].wm_class')
+
+# Focus the project window and put its container in a tabbed layout.
+tab_focus() {
+  # wait up to ~2s for a freshly launched window to map
+  for _ in $(seq 20); do
+    swaymsg -t get_tree | jq -e --arg a "$project_name" '[.. | objects | select(.app_id? == $a)] | length > 0' >/dev/null && break
+    sleep 0.1
+  done
+  swaymsg -q "[app_id=\"$project_name\"] fullscreen disable, focus, layout tabbed"
+}
+
+# If window exists → focus it
+if echo "$all_app_ids" | grep -qx "$project_name"; then
+  tab_focus
+else
+  kitten @ launch \
+    --type=os-window \
+    --os-window-class="$project_name" \
+    --cwd="$selected" > /dev/null
+
+  tab_focus
+  kitten @ close-tab --match 'title:project-launcher' 2> /dev/null
+fi

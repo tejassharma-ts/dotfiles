@@ -1,0 +1,10 @@
+[Unit]
+Description=Say arigato when the charger is plugged in
+After=pipewire-pulse.service
+
+[Service]
+ExecStart=%h/.local/bin/charger-arigato.sh
+Restart=always
+
+[Install]
+WantedBy=default.target

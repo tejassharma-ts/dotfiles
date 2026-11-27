@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# audio-switch — switch the default audio device (PipeWire/PulseAudio).
+#
+# Usage:
+#   audio-switch            cycle to the next output (speakers, BT, HDMI…)
+#   audio-switch prev       cycle to the previous output
+#   audio-switch menu       pick an output from a rofi menu
+#   audio-switch list       print available outputs (* = current)
+#   audio-switch -i ...     same commands, but for inputs (microphones)
+#
+# Running streams are moved to the new device too.
+# Devices whose port is "not available" (e.g. HDMI with no monitor) are skipped.
+
+# Regex of device names to always hide
+IGNORE='audiorelay|\.monitor$'
+
+kind=sink
+if [[ $1 == -i || $1 == --input ]]; then
+	kind=source
+	shift
+fi
+cmd=${1:-next}
+
+# Prints "name<TAB>description" for each usable device
+devices() {
+	pactl -f json list "${kind}s" | jq -r '
+		.[] | .active_port as $a
+		| select(((.ports[]? | select(.name == $a) | .availability) // "") != "not available")
+		| [.name, .description] | @tsv' |
+		IGNORE="$IGNORE" awk -F'\t' '$1 !~ ENVIRON["IGNORE"]'
+}
+
+current=$(pactl "get-default-$kind")
+mapfile -t list < <(devices)
+((${#list[@]})) || { echo "No ${kind}s found" >&2; exit 1; }
+
+names=() descs=() idx=0
+for i in "${!list[@]}"; do
+	names+=("${list[i]%%$'\t'*}")
+	descs+=("${list[i]#*$'\t'}")
+	[[ ${names[i]} == "$current" ]] && idx=$i
+done
+
+case $cmd in
+next) target=${names[(idx + 1) % ${#names[@]}]} ;;
+prev) target=${names[(idx - 1 + ${#names[@]}) % ${#names[@]}]} ;;
+menu)
+	label=Output; [[ $kind == source ]] && label=Input
+	choice=$(printf '%s\n' "${descs[@]}" |
+		rofi -dmenu -i -p "$label" -selected-row "$idx") || exit 0
+	for i in "${!descs[@]}"; do
+		[[ ${descs[i]} == "$choice" ]] && target=${names[i]} && break
+	done
+	;;
+list)
+	for i in "${!names[@]}"; do
+		mark=' '; [[ $i == "$idx" ]] && mark='*'
+		printf '%s %s\n' "$mark" "${descs[i]}"
+	done
+	exit 0
+	;;
+*) sed -n '2,12s/^# \{0,1\}//p' "$0"; exit 1 ;;
+esac
+
+[[ -n $target ]] || exit 1
+pactl "set-default-$kind" "$target"
+
+# Move existing streams so audio follows immediately
+if [[ $kind == sink ]]; then
+	pactl list short sink-inputs | cut -f1 | xargs -r -I{} pactl move-sink-input {} "$target"
+else
+	pactl list short source-outputs | cut -f1 | xargs -r -I{} pactl move-source-output {} "$target" 2>/dev/null
+fi
+
+for i in "${!names[@]}"; do
+	[[ ${names[i]} == "$target" ]] && desc=${descs[i]}
+done
+icon=audio-speakers; [[ $kind == source ]] && icon=audio-input-microphone
+[[ $target == bluez* ]] && icon=bluetooth
+dunstify -a audio-switch -u low -t 1500 -i "$icon" -h string:x-dunst-stack-tag:audio-switch \
+	"Audio ${kind/sink/output}" "$desc"

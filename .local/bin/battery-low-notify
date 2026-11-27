@@ -1,0 +1,21 @@
+#!/bin/sh
+# Notify via dunst when battery drops below 10% while discharging.
+BAT=/sys/class/power_supply/BAT0
+THRESHOLD=10
+STATE="${XDG_RUNTIME_DIR:-/tmp}/battery-low-notified"
+
+cap=$(cat "$BAT/capacity")
+status=$(cat "$BAT/status")
+
+if [ "$status" = "Discharging" ] && [ "$cap" -lt "$THRESHOLD" ]; then
+    # Notify once per drop; re-notify every 2% further down.
+    last=$(cat "$STATE" 2>/dev/null || echo 100)
+    if [ "$cap" -le $((last - 2)) ] || [ ! -f "$STATE" ]; then
+        dunstify -u critical -r 9910 -i battery-caution \
+            "Battery low: ${cap}%" "Plug in your charger."
+        echo "$cap" > "$STATE"
+    fi
+else
+    rm -f "$STATE"
+    dunstify -C 9910 2>/dev/null
+fi

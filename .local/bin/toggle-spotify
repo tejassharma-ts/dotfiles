@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Workspace number for Spotify
+spotify_workspace_num=11
+
+# Get current focused workspace number
+current_ws=$(swaymsg -t get_workspaces | jq '.[] | select(.focused==true).num')
+
+run_spotify() {
+    # Check if Spotify is running; if not, launch it
+    if ! pidof spotify >/dev/null; then
+        spotify --enable-features=UseOzonePlatform --ozone-platform=wayland &
+    fi
+}
+
+# If already on the Spotify workspace, go back to previous
+if [ "$current_ws" -eq "$spotify_workspace_num" ]; then
+    swaymsg workspace back_and_forth
+else
+    # Switch to the Spotify workspace
+    swaymsg workspace number $spotify_workspace_num
+    run_spotify
+fi
+

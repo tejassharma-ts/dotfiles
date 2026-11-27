@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Usage: zen-mode [on|off]  (no arg = toggle) for the current workspace: remove gaps + borders on every window.
+# Waybar lives on the bottom layer behind windows, reserved by `gaps top`.
+# With the top gap at 0 the window covers the bar, so it's hidden per-workspace
+# with no flicker on workspace switch.
+# zen-mode-listener keeps borders off for windows opened/moved into a zen workspace.
+BAR_H=31
+INNER=10
+dir="${XDG_RUNTIME_DIR:-/tmp}/sway-zen"
+mkdir -p "$dir"
+
+ws=$(swaymsg -t get_workspaces | jq -r '.[] | select(.focused) | .name')
+f="$dir/${ws//\//_}"
+
+# Build "[con_id=N] border X;" for every window (tiled + floating) on the workspace.
+border_cmds() {
+    swaymsg -t get_tree | jq -r --arg ws "$ws" --arg tiled "$1" --arg floating "$2" '
+        .. | objects | select(.type == "workspace" and .name == $ws)
+        | (.nodes[] | .. | objects | select(.pid != null) | "[con_id=\(.id)] border \($tiled);"),
+          (.floating_nodes[] | .. | objects | select(.pid != null) | "[con_id=\(.id)] border \($floating);")
+    ' | tr '\n' ' '
+}
+
+mode=${1:-toggle}
+if [ "$mode" = toggle ]; then
+    [ -f "$f" ] && mode=off || mode=on
+fi
+
+if [ "$mode" = off ]; then
+    rm -f "$f"
+    swaymsg -q "gaps inner current set $INNER; gaps top current set $BAR_H; $(border_cmds 'pixel 1' none)"
+else
+    touch "$f"
+    swaymsg -q "gaps inner current set 0; gaps top current set 0; $(border_cmds none none)"
+fi

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+
+# This scripts toggle between so called zen mode by hiding the waybar
+# and eliminating the gaps around window at runtime
+
+# for tracking the zen mode state
+zen_mod_temp_file="/tmp/sway-zen"
+
+# if file doesn't turn on zen mode and create temp file
+if [ ! -f $zen_mod_temp_file ]; then
+    swaymsg border none
+    swaymsg gaps inner all set 0
+    killall waybar 2> /dev/null
+
+    # create temp file
+    echo > $zen_mod_temp_file
+else
+    swaymsg border normal
+    swaymsg gaps inner all set 8
+    swaymsg exec waybar
+    rm -rf $zen_mod_temp_file
+fi
+

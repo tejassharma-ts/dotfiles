@@ -1,0 +1,35 @@
+daemonize
+show-failed-attempts
+clock
+screenshot
+effect-blur=15x15
+effect-vignette=1:1
+color=28282880
+font=Comic Mono
+indicator
+indicator-radius=100
+indicator-idle-visible
+indicator-thickness=10
+line-color=282828
+ring-color=1d2021
+inside-color=282828
+key-hl-color=ea6962
+separator-color=00000000
+text-color=ddc7a1
+text-caps-lock-color=""
+line-ver-color=ea6962
+ring-ver-color=ea6962
+inside-ver-color=282828
+text-ver-color=ddc7a1
+ring-wrong-color=7daea3
+text-wrong-color=7daea3
+inside-wrong-color=282828
+inside-clear-color=282828
+text-clear-color=ddc7a1
+ring-clear-color=89b482
+line-clear-color=282828
+line-wrong-color=282828
+bs-hl-color=7daea3
+datestr=%a, %B %e
+timestr=%I:%M %p
+fade-in=0.3

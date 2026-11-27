@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Keep borders off for windows that appear in (or move into) a zen workspace,
+# and restore them for windows moved out of one.
+dir="${XDG_RUNTIME_DIR:-/tmp}/sway-zen"
+pidfile="${XDG_RUNTIME_DIR:-/tmp}/sway-zen-listener.pid"
+
+# exec_always runs this on every reload: replace the previous instance.
+if [ -f "$pidfile" ]; then
+    old=$(cat "$pidfile")
+    pkill -P "$old" 2>/dev/null
+    kill "$old" 2>/dev/null
+fi
+echo $$ > "$pidfile"
+
+swaymsg -m -t subscribe '["window"]' | jq --unbuffered -r '
+    select(.change == "new" or .change == "move") | "\(.change) \(.container.id) \(.container.type)"
+' | while read -r change id type; do
+    ws=$(swaymsg -t get_tree | jq -r --argjson id "$id" '
+        .. | objects | select(.type == "workspace")
+        | select([.. | objects | .id] | index($id)) | .name' | tail -n1)
+    [ -z "$ws" ] && continue
+    if [ -f "$dir/${ws//\//_}" ]; then
+        swaymsg -q "[con_id=$id] border none"
+    elif [ "$change" = "move" ]; then
+        if [ "$type" = "floating_con" ]; then
+            swaymsg -q "[con_id=$id] border none"
+        else
+            swaymsg -q "[con_id=$id] border pixel 1"
+        fi
+    fi
+done

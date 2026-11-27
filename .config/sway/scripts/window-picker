@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Fuzzy-find and focus a window on the current sway workspace.
+# Bound to $mod+/. Snapshots the window list first, then opens a floating
+# kitty (app_id "window-picker") running fzf over it.
+list="${XDG_RUNTIME_DIR:-/tmp}/sway-window-picker"
+
+if [ "$1" = --pick ]; then
+    source ~/.config/fzf/theme.sh
+    choice=$(fzf --ansi --delimiter='\t' --with-nth=2.. --no-sort --cycle \
+                 --layout=reverse --prompt='window> ' --header='enter: focus · esc: cancel' < "$list")
+    [ -n "$choice" ] && swaymsg -q "[con_id=${choice%%$'\t'*}] focus"
+    exit 0
+fi
+
+ws=$(swaymsg -t get_workspaces | jq -r '.[] | select(.focused) | .name')
+
+# id<TAB>app<TAB>title, focused window marked with a ●
+swaymsg -t get_tree | jq -r --arg ws "$ws" '
+    .. | objects | select(.type == "workspace" and .name == $ws)
+    | [.nodes[], .floating_nodes[]] | .[] | .. | objects
+    | select(.pid != null and .app_id != "window-picker")
+    | (.app_id // .window_properties.class // "?") as $app
+    | "\(.id)\t\(if .focused then "\u001b[33m●\u001b[0m" else " " end) \u001b[36m\($app)\u001b[0m\t\(.name // "")"
+' > "$list"
+
+[ -s "$list" ] || exit 0
+exec kitty --class window-picker -o remember_window_size=no -o confirm_os_window_close=0 \
+    "$0" --pick

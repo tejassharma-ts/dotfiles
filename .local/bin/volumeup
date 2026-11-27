@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+current_volume=$(pactl get-sink-volume @DEFAULT_SINK@ | awk '{print $5}' | sed 's/%//g')
+
+[[ ${current_volume} -ge 100 ]] && pactl set-sink-volume @DEFAULT_SINK@ 100% || pactl set-sink-volume @DEFAULT_SINK@ +5%

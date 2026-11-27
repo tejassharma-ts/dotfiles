@@ -1,0 +1,146 @@
+/* App launcher — drops down under Waybar. Colors come from theme.rasi. */
+
+configuration {
+  modi:                   "drun,window,run";
+  font:                   "Comic Mono 11";
+  show-icons:             true;
+  icon-theme:             "Papirus-Dark";
+  terminal:               "kitty";
+
+  display-drun:           "Apps";
+  display-window:         "Windows";
+  display-run:            "Run";
+  drun-display-format:    "{name}";
+  window-format:          "{c}  ·  {t}";
+
+  /* Matching: fuzzy, accent-insensitive, smart case, best match first */
+  matching:               "fuzzy";
+  normalize-match:        true;
+  case-smart:             true;
+  sort:                   true;
+  sorting-method:         "fzf";
+  drun-match-fields:      "name,generic,exec,categories,keywords";
+  drun-use-desktop-cache: true;   /* faster startup */
+  disable-history:        false;  /* recently used apps float to the top */
+
+  /* Behavior */
+  click-to-exit:          true;
+  hover-select:           true;
+  me-select-entry:        "MousePrimary";
+  me-accept-entry:        "!MousePrimary";
+  scroll-method:          0;
+  cycle:                  true;
+  kb-mode-next:           "Tab,Control+Tab";
+  kb-mode-previous:       "ISO_Left_Tab,Control+ISO_Left_Tab";
+  kb-row-tab:             "";
+  kb-element-next:        "";
+  kb-element-prev:        "";
+  kb-row-down:            "Down,Control+j,Control+n";
+  kb-row-up:              "Up,Control+k,Control+p";
+  kb-remove-to-eol:       "";
+  kb-accept-entry:        "Return,KP_Enter";
+  kb-cancel:              "Escape,Control+g,Control+bracketleft";
+}
+
+@theme "~/.config/rofi/theme.rasi"
+
+* {
+  background-color:       transparent;
+  text-color:             @main-fg;
+  spacing:                0;
+}
+
+window {
+  location:               north;
+  anchor:                 north;
+  y-offset:               41px;  /* aligns with sway window top */
+  width:                  560px;
+  border:                 1px;
+  border-radius: 0;
+  border-color:           @gray;   /* #928374 */
+  background-color:       @main-bg;
+  padding:                8px;
+}
+
+mainbox {
+  spacing:                8px;
+  children:               [ inputbar, listview, mode-switcher ];
+}
+
+/* Search */
+
+inputbar {
+  padding:                8px 12px;
+  spacing:                10px;
+  border-radius: 0;
+  background-color:       @input-bg;
+  children:               [ prompt, entry, num-filtered-rows ];
+}
+prompt {
+  text-color:             @main-br;
+}
+entry {
+  placeholder:            "Seek and you shall find";
+  placeholder-color:      @dim-fg;
+  cursor:                 text;
+}
+num-filtered-rows {
+  text-color:             @dim-fg;
+  expand:                 false;
+}
+
+/* Results */
+
+listview {
+  lines:                  8;
+  columns:                1;
+  fixed-height:           false;
+  dynamic:                true;
+  scrollbar:              false;
+  spacing:                2px;
+}
+
+element {
+  padding:                6px 10px;
+  spacing:                12px;
+  border-radius: 0;
+  cursor:                 pointer;
+}
+element normal.active    { text-color: @active-fg; }
+element normal.urgent    { text-color: @urgent-fg; }
+element selected,
+element selected.normal,
+element selected.active,
+element selected.urgent {
+  background-color:       @select-bg;
+  text-color:             @select-fg;
+}
+element-icon {
+  size:                   22px;
+  cursor:                 inherit;
+}
+element-text {
+  vertical-align:         0.5;
+  text-color:             inherit;
+  cursor:                 inherit;
+}
+
+/* Mode tabs (Tab / Shift+Tab) */
+
+mode-switcher {
+  spacing:                6px;
+}
+button {
+  padding:                4px;
+  border-radius: 0;
+  text-color:             @dim-fg;
+  cursor:                 pointer;
+}
+button selected {
+  background-color:       @input-bg;
+  text-color:             @main-br;
+}
+
+/* Messages (e.g. errors) */
+message   { padding: 6px 10px; border-radius: 0; background-color: @input-bg; }
+textbox   { text-color: @main-fg; }

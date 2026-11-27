@@ -1,0 +1,22 @@
+/* Power menu — same look as the launcher (config.rasi), compact */
+
+@import "~/.config/rofi/config.rasi"
+
+window {
+  width:                  260px;
+}
+mainbox {
+  children:               [ inputbar, listview ];
+}
+inputbar {
+  children:               [ entry ];
+}
+entry {
+  placeholder:            "Power";
+}
+listview {
+  lines:                  6;
+}
+element {
+  children:               [ element-text ];
+}

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+source ~/.config/fzf/theme.sh
+
+selected=$(find ~/walls -mindepth 2 -maxdepth 2 -type f \( -name "*.png" -o -name "*.jpg" \) | fzf )
+
+[[ -z $selected ]] && exit 0
+
+swww img -t fade --transition-step 10 $selected
+
+# wall_name=$(basename "$selected")
+
+# Get all existing kitty app_ids
+# all_app_ids=$(kitten @ ls | jq -r '.[].wm_class')
+
+# If window exists → focus it
+# if echo "$all_app_ids" | grep -qx "$project_name"; then
+#   swaymsg "[app_id=\"$project_name\"] focus"
+# else
+#   kitten @ launch \
+#     --type=os-window \
+#     --os-window-class="$project_name" \
+#     --cwd="$selected" > /dev/null
+
+#   kitten @ close-tab --match 'title:temp-tab' 2> /dev/null
+# fi

@@ -1,0 +1,73 @@
+#!/bin/sh
+# Ask for a duration with rofi, run sowon as a countdown, and alert when it finishes.
+# Usage:
+#   sowon-timer          timer running -> show/hide it (sway scratchpad); none running -> rofi prompt
+#   sowon-timer --new    always prompt with rofi and start another timer
+#   sowon-timer <time>   start a timer directly (10, 30s, 5m, 1h30m)
+# Triggered by the waybar clock (left click: toggle/prompt, right click: --new) and $mod+Shift+t.
+# A sway for_window rule sends sowon windows to the scratchpad.
+#
+# sowon exit codes: 0 = countdown finished (-e), 1 = bad time input, 2 = window closed manually.
+
+SOWON=/home/verissimus/github/sowon/sowon
+SOUND=/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga
+REPEAT=1
+
+# Presets shown in rofi: "<time> <label>", one per line.
+PRESETS='50m work
+30m break
+10m break'
+
+is_time() { printf '%s' "$1" | grep -Eq '^([0-9]+(\.[0-9]+)?[smh]?)+$'; }
+
+# Prints "<time> <label>". Typed text wins if it is a valid time (so typing "5" doesn't
+# pick "50m work"); otherwise the highlighted preset is used (e.g. after typing "work").
+prompt() {
+    out=$(printf '%s\n' "$PRESETS" | awk '{ printf "%-5s  %s\n", $1, $2 }' |
+        rofi -dmenu -i -p "Timer" -l "$(printf '%s\n' "$PRESETS" | wc -l)" \
+             -format 'f	s' -theme-str 'entry { placeholder: "pick, or type 25m / 1h30m"; }') || exit 0
+    typed=$(printf '%s' "${out%%	*}" | tr -d '[:space:]')
+    picked=${out#*	}
+    if [ -n "$typed" ] && is_time "$typed"; then
+        echo "$typed"
+    else
+        echo "$picked"
+    fi
+}
+
+case $1 in
+    '')
+        if pgrep -x sowon >/dev/null; then
+            swaymsg '[title="- sowon \(RGFW\)$"] scratchpad show' >/dev/null
+            exit 0
+        fi
+        choice=$(prompt)
+        ;;
+    --new)
+        choice=$(prompt)
+        ;;
+    *)
+        choice=$*
+        ;;
+esac
+t=$(printf '%s\n' "$choice" | awk '{ print $1 }')
+label=$(printf '%s\n' "$choice" | awk '{ $1 = ""; sub(/^ +/, ""); print }')
+[ -z "$t" ] && exit 0
+
+err=$("$SOWON" -e "$t" 2>&1 >/dev/null)
+case $? in
+    0)
+        notify-send -u critical -i alarm-clock "Time's up${label:+: $label}" "$t timer finished"
+        i=0
+        while [ "$i" -lt "$REPEAT" ]; do
+            pw-play "$SOUND"
+            i=$((i + 1))
+        done
+        ;;
+    1)
+        notify-send -u normal "sowon-timer" "Invalid time '$t': $err (use e.g. 10, 30s, 5m, 1h30m)"
+        ;;
+    *)
+        : # closed manually: cancelled, stay quiet
+        ;;
+esac

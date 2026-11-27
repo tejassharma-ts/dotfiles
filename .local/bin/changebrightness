@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+case $1 in
+up)
+	brillo -A 1 -q -u 150000
+	;;
+down)
+	brillo -U 1 -q -u 150000
+	;;
+esac
+
+percent=$(brillo | cut -d. -f1)
+
+dunstify -a changebrightness -u low -t 1500 \
+	-h int:value:"${percent}" \
+	"Brightness" "${percent}%"

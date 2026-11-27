@@ -1,0 +1,511 @@
+{
+  // ─────────────────────────────────────────────────────────────┤ header ├───
+
+  "layer": "bottom",
+  "exclusive": false,
+  "position": "top",
+  "reload_style_on_change": true,
+  "gtk-layer-shell": true,
+  "bar_id": "bar-0",
+  "ipc": false,
+  // ──────────────────────────────────────────────────────────┤ positions ├───
+
+  "modules-left": [
+    // "custom/theme",         // theme switcher
+    "custom/left1",
+
+    "sway/workspaces",  // workspaces
+    "custom/right1",
+
+    "custom/paddw",
+    "sway/window"       // window title
+  ],
+
+  "modules-center": [
+    "custom/paddc",
+    "custom/left2",
+    "custom/temperature",   // temperature
+
+    "custom/left3",
+    "memory",               // memory
+
+    "custom/left4",
+    "cpu",                  // cpu
+    "custom/leftin1",
+
+    "custom/left5",
+    "custom/distro",        // distro icon
+    "custom/right2",
+
+    "custom/rightin1",
+    // "idle_inhibitor",    // idle inhibitor (removed)
+    "clock#time",           // time
+    "custom/right3",
+
+    "clock#date",           // date
+    "custom/right4",
+
+    "custom/wifi",          // wi-fi
+    "bluetooth",            // bluetooth
+    "custom/update",        // system update
+    "custom/right5"
+  ],
+
+  "modules-right": [
+    "custom/left9",
+    "custom/powerprofile",  // power profile (click to cycle)
+
+    "custom/left6",
+    "pulseaudio",           // output device
+
+    "custom/left7",
+    "backlight",            // brightness
+
+    "custom/left8",
+    "battery",              // battery
+
+    "custom/leftin2",
+    "custom/power"          // power button
+  ],
+
+  // ─────────────────────────────────────────────────────┤ theme switcher ├───
+
+  "custom/theme": {
+    "exec": "~/.config/waybar/scripts/current-theme.sh",
+    "return-type": "json",
+    "format": " 󰍜 ",
+    "on-click": "~/.config/waybar/scripts/theme-switcher.sh",
+    "min-length": 3,
+    "max-length": 3
+  },
+
+  // ─────────────────────────────────────────────────────────┤ workspaces ├───
+
+  "sway/workspaces": {
+    "format": "{icon}",
+    "format-icons": {
+      "1": "一", "2": "二", "3": "三", "4": "四", "5": "五",
+      "6": "六", "7": "七", "8": "八", "9": "九", "10": "十",
+      "11": "十一", "12": "十二", "13": "十三", "14": "十四", "15": "十五"
+    },
+    "disable-scroll": false,          // built-in: scroll switches workspace
+    "disable-scroll-wraparound": true,
+    "persistent-workspaces": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": [],
+      "6": [],
+      "7": [],
+      "8": [],
+      "9": [],
+      "10": [],
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────┤ window ├───
+
+  "sway/window": {
+    "swap-icon-label": false,
+    // "app_id|title" so rules can match the app, whatever the title says
+    "format": "{app_id}|{title}",
+    "tooltip": false,
+    "min-length": 5,
+
+    // each input matches exactly ONE rule (waybar applies every matching rule)
+    "rewrite": {
+      "^\\|?$": "<span foreground='#458588'>[wm]</span> Sway",
+      "^(?:kitty|alacritty|foot|org\\.wezfurlong\\.wezterm|ghostty)\\|(.*)$": "<span foreground='#d79921'>&gt;_</span> $1",
+      "^(?:helium[^|]*)\\|(.*?)(?: - Helium)?$": "<span foreground='#458588'>[www]</span> $1",
+      "^(?:firefox)\\|(.*?)(?: — Mozilla Firefox)?$": "<span foreground='#cc241d'>[ff]</span> $1",
+      "^(?:zen[^|]*)\\|(.*?)(?: — Zen Browser)?$": "<span foreground='#d65d0e'>[zn]</span> $1",
+      "^(?:google-chrome|chromium|brave-browser|vivaldi[^|]*)\\|(.*)$": "<span foreground='#d79921'>[www]</span> $1",
+      "^(?:code|code-oss|cursor|antigravity)\\|(.*?)(?: - (Visual Studio Code|Cursor|Antigravity))?$": "<span foreground='#458588'>&lt;/&gt;</span> $1",
+      "^(?:dev\\.zed\\.zed|zed|lite-xl|helix)\\|(.*)$": "<span foreground='#458588'>&lt;/&gt;</span> $1",
+      "^(?:spotify)\\|(.*)$": "<span foreground='#98971a'>[~]</span> $1",
+      "^(?:mpv)\\|(.*?)(?: - mpv)?$": "<span foreground='#b16286'>[mpv]</span> $1",
+      "^(?:vlc)\\|(.*?)(?: - VLC media player)?$": "<span foreground='#d65d0e'>[vlc]</span> $1",
+      "^(?:com\\.obsproject\\.studio|obs)\\|(.*)$": "<span foreground='#d5c4a1'>[obs]</span> $1",
+      "^(?:discord|vesktop|ferdium)\\|(.*)$": "<span foreground='#458588'>[dc]</span> $1",
+      "^(?:org\\.kde\\.okular|okular)\\|(.*)$": "<span foreground='#cc241d'>[pdf]</span> $1",
+      "^(?:libreoffice[^|]*|onlyoffice[^|]*|desktopeditors)\\|(.*)$": "<span foreground='#458588'>[doc]</span> $1",
+      "^(?:postman)\\|(.*)$": "<span foreground='#d65d0e'>[api]</span> $1",
+      "^(?:mongodb compass|mongodb-compass)\\|(.*)$": "<span foreground='#98971a'>[db]</span> $1",
+      "^(?:caido)\\|(.*)$": "<span foreground='#b16286'>[sec]</span> $1",
+      "^(?:thunar|org\\.kde\\.dolphin)\\|(.*)$": "<span foreground='#d79921'>[fm]</span> $1",
+      "^(?:org\\.qbittorrent\\.qbittorrent|qbittorrent)\\|(.*)$": "<span foreground='#98971a'>[qb]</span> $1",
+      "^(?:keepassxc|org\\.keepassxc\\.keepassxc|keepass)\\|(.*)$": "<span foreground='#98971a'>[pw]</span> $1",
+      "^(?:org\\.pulseaudio\\.pavucontrol|pavucontrol|noisetorch)\\|(.*)$": "<span foreground='#89b482'>[snd]</span> $1",
+      "^(?:blueman-manager|\\.blueman-manager-wrapped)\\|(.*)$": "<span foreground='#7daea3'>[bt]</span> $1",
+      "^(?:github desktop|github-desktop)\\|(.*)$": "<span foreground='#d5c4a1'>[git]</span> $1",
+      "^(?:packettracer[^|]*|cisco[^|]*)\\|(.*)$": "<span foreground='#7daea3'>[net]</span> $1",
+      "^(?:imv|qview|com\\.interversehq\\.qview|swayimg)\\|(.*)$": "<span foreground='#d79921'>[img]</span> $1",
+      "^(?:nwg-look)\\|(.*)$": "<span foreground='#d5c4a1'>[cfg]</span> $1",
+      "^\\|(.+)$": "<span foreground='#928374'>[x11]</span> $1",
+      "^(?!(?:kitty|alacritty|foot|org\\.wezfurlong\\.wezterm|ghostty|helium[^|]*|firefox|zen[^|]*|google-chrome|chromium|brave-browser|vivaldi[^|]*|code|code-oss|cursor|antigravity|dev\\.zed\\.zed|zed|lite-xl|helix|spotify|mpv|vlc|com\\.obsproject\\.studio|obs|discord|vesktop|ferdium|org\\.kde\\.okular|okular|libreoffice[^|]*|onlyoffice[^|]*|desktopeditors|postman|mongodb compass|mongodb-compass|caido|thunar|org\\.kde\\.dolphin|org\\.qbittorrent\\.qbittorrent|qbittorrent|keepassxc|org\\.keepassxc\\.keepassxc|keepass|org\\.pulseaudio\\.pavucontrol|pavucontrol|noisetorch|blueman-manager|\\.blueman-manager-wrapped|github desktop|github-desktop|packettracer[^|]*|cisco[^|]*|imv|qview|com\\.interversehq\\.qview|swayimg|nwg-look)\\|)([^|]+)\\|(.*)$": "<span foreground='#928374'>[$1]</span> $2"
+    }
+  },
+
+  // ────────────────────────────────────────────────────────┤ temperature ├───
+
+  "custom/temperature": {
+    "exec": "~/.config/waybar/scripts/cpu-temp.sh",
+    "return-type": "json",
+    "format": "{}",
+    "interval": 5,
+    "min-length": 8,
+    "max-length": 8
+  },
+
+  // ─────────────────────────────────────────────────────────────┤ memory ├───
+
+  "memory": {
+    "states": {
+      "warning": 75,
+      "critical": 90
+    },
+
+    "format": "<span color='#a9b665' rise='-1024'></span> {percentage}%",
+    "format-warning": "<span color='#e78a4e' rise='-1024'></span> {percentage}%",
+    "format-critical": "<span color='#ea6962' rise='-1024'></span> {percentage}%",
+    "tooltip": false,
+    // "tooltip-format": "Memory Used: {used:0.1f} GB / {total:0.1f} GB",
+    "interval": 5,
+    "min-length": 7,
+    "max-length": 7
+  },
+
+  // ────────────────────────────────────────────────────────────────┤ cpu ├───
+
+  "cpu": {
+    "states": { "warning": 60, "critical": 85 },
+    "format": "<span color='#a9b665' letter_spacing='3840'></span> {usage}%",
+    "format-warning": "<span color='#e78a4e' letter_spacing='3840'></span> {usage}%",
+    "format-critical": "<span color='#ea6962' letter_spacing='3840'></span> {usage}%",
+    "tooltip": false,
+    "interval": 5,
+    "min-length": 6,
+    "max-length": 6
+  },
+
+  // ──────────────────────────────────────────────────────┤ power profile ├───
+
+  "custom/powerprofile": {
+    "exec": "~/.config/waybar/scripts/power-profile.sh",
+    "return-type": "json",
+    "format": "{}",
+    "interval": 5,
+    "signal": 8,
+    "on-click": "~/.config/waybar/scripts/power-profile.sh next",
+    "on-click-right": "~/.config/waybar/scripts/power-profile.sh prev"
+  },
+
+  "custom/left9": {
+    "format": "",
+    "tooltip": false
+  },
+
+  // ─────────────────────────────────────────────────────────────┤ distro ├───
+
+  "custom/distro": {
+    "format": " ",
+    "tooltip": false
+  },
+
+  // ─────────────────────────────────────────────────────┤ idle inhibitor ├───
+
+  "idle_inhibitor": {
+    "format": "{icon}",
+
+    "format-icons": {
+      "activated": "<span color='#d8a657' rise='-1500'></span> ",
+      "deactivated": "<span color='#928374' rise='-1500'></span> "
+    },
+
+    "tooltip-format-activated": "Presentation Mode",
+    "tooltip-format-deactivated": "Idle Mode",
+    "start-activated": false
+  },
+
+  // ───────────────────────────────────────────────────────────────┤ time ├───
+
+  "clock#time": {
+    "format": "<span color='#89b482' letter_spacing='5376'></span> {:%H:%M}",
+    "tooltip": false,
+    "on-click": "~/.config/sway/scripts/sowon-timer",              // show/hide running timer, else rofi prompt
+    "on-click-right": "~/.config/sway/scripts/sowon-timer --new",  // always start a new timer
+    // "tooltip-format": "Standard Time: {:%I:%M %p}",
+        
+  },
+
+  // ───────────────────────────────────────────────────────────────┤ date ├───
+
+  "clock#date": {
+    "format": "<span color='#89b482' letter_spacing='3072'></span> {:%m-%d}",
+    "tooltip-format": "<span font_family='Comic Mono' size='11pt'>{calendar}</span>",
+
+    "calendar": {
+      "mode": "month",
+      "mode-mon-col": 3,
+      "on-scroll": 1,
+
+      "format": {
+        "months":
+          "<span color='#d8a657'><b>{}</b></span>",
+        "weekdays":
+          "<span color='#a89984'>{}</span>",
+        "days":
+          "<span color='#ddc7a1'>{}</span>",
+        "today":
+          "<span background='#d8a657' color='#191B1C'><b>{}</b></span>"
+      }
+    },
+
+    "actions": {
+      "on-click": "mode",
+      "on-click-right": "shift_reset",
+      "on-scroll-up": "shift_up",
+      "on-scroll-down": "shift_down"
+    },
+
+    "min-length": 8,
+    "max-length": 8
+  },
+
+  // ──────────────────────────────────────────────────────────────┤ wi-fi ├───
+
+  "custom/wifi": {
+    "exec": "~/.config/waybar/scripts/wifi-status.sh",
+    "return-type": "json",
+    "format": "{}",
+    "on-click": "~/.config/waybar/scripts/wifi-menu.sh",
+    "on-click-right": "kitty --title '󰤨  Network Manager TUI' bash -c nmtui",
+    "interval": 1,
+    "min-length": 1,
+    "max-length": 1
+  },
+
+  // ──────────────────────────────────────────────────────────┤ bluetooth ├───
+
+  "bluetooth": {
+    "format": "",
+    "format-disabled": "<span color='#928374'></span>",
+    "format-off": "<span color='#928374'></span>",
+    "format-connected": "<span color='#7daea3'></span>",
+    "format-connected-battery": "<span color='#7daea3'></span>",
+
+    "tooltip-format": 
+      "{num_connections} connected",
+    "tooltip-format-disabled": 
+      "Bluetooth Disabled",
+    "tooltip-format-connected": 
+      "{device_enumerate}",
+    "tooltip-format-enumerate-connected": 
+      "{device_alias}",
+    "tooltip-format-enumerate-connected-battery": 
+      ":: {device_alias}: 󱊣 {device_battery_percentage}%",
+
+    "on-click": "~/.config/waybar/scripts/bluetooth-menu.sh",
+    "on-click-right": "kitty --title '󰂯  Bluetooth TUI' bash -c bluetui",
+    "interval": 1,
+    "min-length": 1,
+    "max-length": 1
+  },
+
+  // ─────────────────────────────────────────────────────────┤ media info ├───
+
+  "mpris": {
+    "format": "{player_icon} {title} - {artist}",
+    "format-paused": "{status_icon} {title} - {artist}",
+
+    "player-icons": {
+      "default": "󰝚 ",
+      "spotify": "<span foreground='#98971a'>󰓇 </span>",
+      "firefox": "<span foreground='#cc241d'>󰗃 </span>"
+    },
+    "status-icons": {
+      "paused": "<span color='#928374'>\u200A\u200A󰏤\u2009\u2009</span>"
+    },
+
+    "tooltip-format": "Playing: {title} - {artist}\n{player}  ·  click: play/pause  ·  scroll: seek",
+    "tooltip-format-paused": "Paused: {title} - {artist}\n{player}  ·  click: play/pause",
+    "min-length": 5,
+    "max-length": 35,
+
+    "on-click": "playerctl --player=spotify,%any play-pause",
+    "on-click-right": "playerctl --player=spotify,%any next",
+    "on-click-middle": "playerctl --player=spotify,%any previous",
+    "on-scroll-up": "playerctl --player=spotify,%any position 5+",
+    "on-scroll-down": "playerctl --player=spotify,%any position 5-"
+  },
+
+  "custom/media-prev": {
+    "format": "{}",
+    "exec": "echo 󰒮",
+    "exec-if": "playerctl status",
+    "interval": 2,
+    "on-click": "playerctl --player=spotify,%any previous",
+    "tooltip-format": "Previous track"
+  },
+
+  "custom/media-next": {
+    "format": "{}",
+    "exec": "echo 󰒭",
+    "exec-if": "playerctl status",
+    "interval": 2,
+    "on-click": "playerctl --player=spotify,%any next",
+    "tooltip-format": "Next track"
+  },
+
+  // ──────────────────────────────────────────────────────┤ output device ├───
+
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-muted": "<span color='#ea6962' letter_spacing='5376'></span> {volume}%",
+
+    "format-icons": {
+      "default": ["<span color='#7daea3' letter_spacing='5376'></span>", "<span color='#7daea3' letter_spacing='5376'></span>", "<span color='#7daea3' letter_spacing='5376'></span>"],
+      "headphone": "<span color='#7daea3' letter_spacing='5376'></span>",
+      "headset": "<span color='#7daea3' letter_spacing='5376'></span>"
+    },
+
+    "tooltip-format": "Device: {desc}",
+    "on-click": "~/.config/waybar/scripts/volume-control.sh -o m",
+    "on-scroll-up": "~/.config/waybar/scripts/volume-control.sh -o i",
+    "on-scroll-down": "~/.config/waybar/scripts/volume-control.sh -o d",
+    "min-length": 6,
+    "max-length": 6
+  },
+
+  // ─────────────────────────────────────────────────────────┤ brightness ├───
+
+  "backlight": {
+    "format": "{icon} {percent}%",
+    "format-icons": ["<span color='#928374' letter_spacing='5376'></span>", "<span color='#928374' letter_spacing='5376'></span>", "<span color='#d8a657' letter_spacing='5376'></span>", "<span color='#d8a657' letter_spacing='5376'></span>", "<span color='#d8a657' letter_spacing='5376'></span>"],
+    "tooltip": false,
+    "on-scroll-up": "~/.config/waybar/scripts/brightness-control.sh -o i",
+    "on-scroll-down": "~/.config/waybar/scripts/brightness-control.sh -o d",
+    "min-length": 6,
+    "max-length": 6
+  },
+
+  // ────────────────────────────────────────────────────────────┤ battery ├───
+
+  "battery": {
+    "bat": "BAT0",
+    "adapter": "AC",
+    "states": {
+      "warning": 20,
+      "critical": 10
+    },
+
+    "format": "{icon} {capacity}%",
+    "format-icons": ["<span color='#ea6962' letter_spacing='3840'></span>", "<span color='#e78a4e' letter_spacing='3840'></span>", "<span color='#d8a657' letter_spacing='3840'></span>", "<span color='#a9b665' letter_spacing='3840'></span>", "<span color='#a9b665' letter_spacing='3840'></span>"],
+    "format-charging": "<span color='#a9b665' letter_spacing='3840'></span> {capacity}%",
+    "format-plugged": "<span color='#a9b665' letter_spacing='3840'></span> {capacity}%",
+
+    "tooltip-format": "Discharging: {time}",
+    "tooltip-format-charging": "Charging: {time}",
+    "interval": 1,
+    "min-length": 6,
+    "max-length": 6
+  },
+
+  // ───────────────────────────────────────────────────────┤ power button ├───
+
+  "custom/power": {
+    "format": " ",
+    "tooltip": false,
+    // "tooltip-format": "Power Menu",
+    "on-click": "~/.config/waybar/scripts/power-menu.sh"
+  },
+
+  // ────────────────────────────────────────────────────────────┤ padding ├───
+
+  "custom/paddw": {
+    "format": " ",
+    "tooltip": false
+  },
+
+  "custom/paddc": {
+    "format": " ",
+    "tooltip": false
+  },
+
+  // ────────────────────────────────────────────────────────┤ left arrows ├───
+
+  "custom/left1": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/left2": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/left3": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/left4": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/left5": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/left6": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/left7": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/left8": {
+    "format": "",
+    "tooltip": false
+  },
+
+  // ───────────────────────────────────────────────────────┤ right arrows ├───
+
+  "custom/right1": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/right2": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/right3": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/right4": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/right5": {
+    "format": "",
+    "tooltip": false
+  },
+
+  // ───────────────────────────────────────────────────────┤ left inverse ├───
+
+  "custom/leftin1": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/leftin2": {
+    "format": "",
+    "tooltip": false
+  },
+
+  // ──────────────────────────────────────────────────────┤ right inverse ├───
+
+  "custom/rightin1": {
+    "format": "",
+    "tooltip": false
+  }
+}
