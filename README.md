@@ -4,6 +4,10 @@ My Arch Linux + Sway setup. Gruvbox Material everywhere, Comic Mono, and a pile 
 
 Only the core of the workflow lives here: the window manager, bar, launcher, terminal, shell and the scripts I bind to keys. App-specific configs (browsers and so on) stay out. My Neovim config has [its own repo](https://github.com/tejassharma-ts/nvim).
 
+## Current Setup
+
+![Sway desktop with the Gruvbox Material waybar: workspaces, CPU, memory, temperature, clock, power profile, volume, brightness and battery](.github/setup.jpg)
+
 ## What's inside
 
 | Path | What it does |
