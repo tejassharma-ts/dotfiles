@@ -2,7 +2,7 @@
 
 My Arch Linux + Sway setup. Gruvbox Material everywhere, Comic Mono, and a pile of small scripts that glue the workflow together.
 
-Only the core of the workflow lives here: the window manager, bar, launcher, terminal, shell and the scripts I bind to keys. App-specific configs (browsers and so on) stay out. My Neovim config has [its own repo](https://github.com/tejassharma-ts).
+Only the core of the workflow lives here: the window manager, bar, launcher, terminal, shell and the scripts I bind to keys. App-specific configs (browsers and so on) stay out. My Neovim config has [its own repo](https://github.com/tejassharma-ts/nvim).
 
 ## What's inside
 
