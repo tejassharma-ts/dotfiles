@@ -14,6 +14,9 @@ _GIT_ACCOUNTS=(
   work     "TEJAS|you@work.example|$HOME/.ssh/id_ed25519"
 )
 
+# Real names/emails live outside the repo; this file redefines _GIT_ACCOUNTS.
+[[ -r ~/.config/zsh/git-accounts.local.zsh ]] && source ~/.config/zsh/git-accounts.local.zsh
+
 git-account() {
   local choice=$1
   if [[ -z $choice ]]; then
